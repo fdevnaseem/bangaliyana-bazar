@@ -5,13 +5,15 @@ interface Props {
   palette: [string, string, string]
   label: string
   className?: string
+  /** true হলে নিজের ফ্রেম আঁকে না। কার্ডে সেলাই আর আলপনা আলাদা আসে। */
+  plain?: boolean
 }
 
 /**
  * সব পণ্যের ছবি হাতে আঁকা এসভিজি। কোনো ফটো নেই।
  * প্রতিটি কাজের নিজের নকশা আছে। যেমন জামদানির ফুল, কাঁথার সেলাই।
  */
-export default function ProductArt({ art, palette, label, className }: Props) {
+export default function ProductArt({ art, palette, label, className, plain = false }: Props) {
   const [c1, c2, c3] = palette
   return (
     <svg
@@ -22,14 +24,18 @@ export default function ProductArt({ art, palette, label, className }: Props) {
       preserveAspectRatio="xMidYMid slice"
     >
       <rect width="400" height="300" fill={c3} />
-      <g fill={c1} opacity="0.9">
-        <circle cx="18" cy="18" r="4" />
-        <circle cx="382" cy="18" r="4" />
-        <circle cx="18" cy="282" r="4" />
-        <circle cx="382" cy="282" r="4" />
-      </g>
-      <rect x="10" y="10" width="380" height="280" fill="none" stroke={c1} strokeWidth="3" rx="10" />
-      <rect x="18" y="18" width="364" height="264" fill="none" stroke={c2} strokeWidth="1.5" strokeDasharray="8 6" rx="8" />
+      {!plain && (
+        <>
+          <g fill={c1} opacity="0.9">
+            <circle cx="18" cy="18" r="4" />
+            <circle cx="382" cy="18" r="4" />
+            <circle cx="18" cy="282" r="4" />
+            <circle cx="382" cy="282" r="4" />
+          </g>
+          <rect x="10" y="10" width="380" height="280" fill="none" stroke={c1} strokeWidth="3" rx="10" />
+          <rect x="18" y="18" width="364" height="264" fill="none" stroke={c2} strokeWidth="1.5" strokeDasharray="8 6" rx="8" />
+        </>
+      )}
       {art === 'jamdani' && (
         <g>
           <rect x="60" y="40" width="280" height="220" rx="8" fill={c1} />
@@ -139,7 +145,6 @@ export default function ProductArt({ art, palette, label, className }: Props) {
           {[0, 1, 2, 3].map((i) => (
             <circle key={i} cx={95 + i * 16} cy="215" r="6" fill={c2} />
           ))}
-          <text x="200" y="80" textAnchor="middle" fontSize="20" fill={c3} fontFamily="Noto Serif Bengali, serif">ঢাকা • রিকশা আর্ট</text>
         </g>
       )}
       {art === 'gamchha' && (
@@ -182,7 +187,6 @@ export default function ProductArt({ art, palette, label, className }: Props) {
           {[0, 1, 2, 3, 4].map((i) => (
             <circle key={i} cx={130 + i * 35} cy="150" r="14" fill={c2} />
           ))}
-          <text x="200" y="245" textAnchor="middle" fontSize="22" fill={c1} fontFamily="Noto Serif Bengali, serif">নকশি পিঠা</text>
         </g>
       )}
       {art === 'pati' && (

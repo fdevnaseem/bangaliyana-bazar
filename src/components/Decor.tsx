@@ -1,14 +1,15 @@
 /** আলপনা ভাগ, চলমান লেখা আর বৈশাখের সূর্য। */
+import { AlpanaFlower } from './Alpana'
+import { StitchLine } from './Stitch'
 
-export function AlpanaBorder() {
+/** দুই সারি সেলাই, মাঝখানে একটা আলপনা ফুল। গাঢ় জমিনে হলুদ আর সাদা সুতো। */
+export function AlpanaBorder({ onDark = false }: { onDark?: boolean }) {
+  const colors: [string, string] = onDark ? ['var(--color-holud)', 'var(--color-alpana)'] : ['var(--color-rickshaw)', 'var(--color-holud)']
   return (
-    <div aria-hidden="true" className="flex items-center gap-2 py-1">
-      <div className="kantha-border flex-1" />
-      <svg width="26" height="26" viewBox="0 0 26 26" className="shrink-0 animate-spin-slow">
-        <circle cx="13" cy="13" r="9" fill="#f59e0b" />
-        <circle cx="13" cy="13" r="4" fill="#b91c1c" />
-      </svg>
-      <div className="kantha-border flex-1" />
+    <div aria-hidden="true" className="flex items-center gap-3 py-1">
+      <StitchLine colors={colors} className="flex-1" />
+      <AlpanaFlower petal={onDark ? 'var(--color-holud)' : undefined} className="h-10 w-10 shrink-0" />
+      <StitchLine colors={colors} className="flex-1" />
     </div>
   )
 }
@@ -19,7 +20,6 @@ const MARQUEE_ITEMS = [
   'বাংলার ঐতিহ্য',
   'নকশি কাঁথা',
   'জামদানি',
-  'রিকশা আর্ট',
   'পহেলা বৈশাখ',
   'কারিগরের হাতের ছোঁয়া',
 ]
@@ -65,6 +65,20 @@ export function BoishakhSun({ className = '' }: { className?: string }) {
       <circle cx="100" cy="100" r="38" fill="#fff7e6" />
       <circle cx="100" cy="100" r="22" fill="#b91c1c" />
       <text x="100" y="108" textAnchor="middle" fontSize="22" fill="#fff7e6" fontFamily="Noto Serif Bengali, serif">১৪৩৩</text>
+    </svg>
+  )
+}
+
+/** লোগো: হোম পাতার বৈশাখের সূর্য, ছোট মাপে, সাল ছাড়া। favicon.svg-ও এই নকশা। */
+export function SunMark({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 200 200" className={className} aria-hidden="true">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <line key={i} x1="100" y1="8" x2="100" y2="34" stroke="#f59e0b" strokeWidth="13" strokeLinecap="round" transform={`rotate(${i * 30} 100 100)`} />
+      ))}
+      <circle cx="100" cy="100" r="54" fill="#f59e0b" />
+      <circle cx="100" cy="100" r="38" fill="#fff7e6" />
+      <circle cx="100" cy="100" r="23" fill="#b91c1c" />
     </svg>
   )
 }

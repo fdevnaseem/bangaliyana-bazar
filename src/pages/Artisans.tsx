@@ -1,61 +1,66 @@
 import { Link } from 'react-router-dom'
-import { ARTISANS, PRODUCTS } from '../data/products'
-import { useReveal } from '../hooks/useReveal'
+import { bn, formatBDT } from '../data/products'
+import { useMarket } from '../store/market'
+import { sellerIdOf } from '../data/sellers'
+import ProductPicture from '../components/ProductPicture'
+import { StitchFrame } from '../components/Stitch'
 
 export default function Artisans() {
-  useReveal([])
+  const { sellers, catalog } = useMarket()
+  const approved = sellers.filter((s) => s.status === 'approved')
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <p className="text-sm tracking-widest text-rickshaw">কারিগর</p>
-      <h1 className="mt-1 text-4xl">যাদের হাতে এই বাজার</h1>
-      <p className="mt-3 max-w-3xl text-stone-700">
-        বাঙালিয়ানা বাজার কোনো কারখানা নয়। এটা ছয় জেলার কারিগরদের একটা মেলা।
-        তাঁতঘর, কুমোরপাড়া, কাঁথা সেলাইয়ের উঠোন আর রিকশা আর্টের দোকান থেকে
-        সরাসরি আপনার ঘরে। প্রতিটি পণ্যের পাশে কারিগরের নাম লেখা থাকে। কাজটা তাঁদের।
-        আমরাই শুধু পৌঁছে দিই।
-      </p>
+      <h1 className="text-4xl">যাদের হাতে এই বাজার</h1>
+      <p className="mt-3 max-w-3xl text-stone-700">কাজটা তাঁদের। আমরা শুধু আপনার ঘরে পৌঁছে দিই।</p>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {ARTISANS.map((a) => {
-          const works = PRODUCTS.filter((p) => p.artisan === a.name)
+      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {approved.map((a) => {
+          const works = catalog.filter((p) => sellerIdOf(p) === a.id)
+          const emblem = works[0]
           return (
-            <article key={a.name} className="reveal rounded-3xl border-2 border-amber-200 bg-white p-6 shadow-sm">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rickshaw font-display text-2xl text-white" aria-hidden="true">
-                {a.name.charAt(0)}
+            <article key={a.id} className="relative flex flex-col rounded-[10px] bg-paper p-6">
+              <StitchFrame />
+              <div className="flex items-center gap-4">
+                {emblem && (
+                  // কারিগরের নিজের কাজের নকশা দিয়ে গোল প্রতীক, চারপাশে সেলাই
+                  <div className="relative h-20 w-20 shrink-0 rounded-full p-1 ring-2 ring-holud ring-offset-2 ring-offset-paper" aria-hidden="true">
+                    <ProductPicture product={emblem} label="" className="h-full w-full rounded-full" />
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-2xl"><Link to={`/dokan/${a.id}`} className="hover:text-rickshaw">{a.shopName}</Link></h2>
+                  <p className="text-rickshaw">{a.craft}, {a.district}</p>
+                  {a.years && <p className="text-sm text-stone-500">{bn(a.years)} বছর ধরে</p>}
+                </div>
               </div>
-              <h2 className="mt-3 font-display text-2xl">{a.name}</h2>
-              <p className="text-sm text-rickshaw">{a.craft} • {a.district}</p>
-              <p className="text-sm text-stone-500">{a.years} বছরের অভিজ্ঞতা</p>
-              <p className="mt-3 text-sm text-stone-700">{a.note}</p>
+              <p className="mt-4 text-stone-700">{a.story}</p>
               {works.length > 0 && (
-                <p className="mt-3 text-sm">
-                  তাঁর কাজ:{' '}
-                  {works.map((w, i) => (
-                    <span key={w.id}>
-                      <Link to={`/product/${w.id}`} className=" text-rickshaw underline">{w.nameBn}</Link>
-                      {i < works.length - 1 ? ', ' : ''}
-                    </span>
+                // কাজ যতগুলোই থাক (সর্বোচ্চ ৪), পুরো জায়গাটা ভরে থাকে: ১টা পুরোটা, ২টা দুই ভাগ, ৩টা কোলাজ, ৪টা সমান ঘর
+                <ul className={`mt-auto grid h-64 gap-2 pt-5 ${works.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} ${works.length >= 3 ? 'grid-rows-2' : ''}`}>
+                  {works.slice(0, 4).map((w, i) => (
+                    <li key={w.id} className={`min-h-0 ${works.length === 3 && i === 0 ? 'row-span-2' : ''}`}>
+                      <Link to={`/product/${w.id}`} className="group relative block h-full overflow-hidden rounded">
+                        <ProductPicture product={w} className="block h-full w-full transition-transform duration-500 group-hover:scale-105" />
+                        <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 to-transparent px-2.5 pt-6 pb-1.5 text-cream">
+                          <p className="text-sm leading-snug">{w.nameBn}</p>
+                          <p className="text-sm text-amber-200">{formatBDT(w.price)}</p>
+                        </div>
+                      </Link>
+                    </li>
                   ))}
-                </p>
+                </ul>
               )}
             </article>
           )
         })}
       </div>
 
-      <section className="reveal mt-10 rounded-3xl bg-leaf-soft p-8">
-        <h2 className="text-2xl">কারিগর কীভাবে যুক্ত হন?</h2>
-        <ol className="mt-4 list-decimal space-y-2 pl-6 text-stone-700">
-          <li>কারিগর তাঁর কাজের নমুনা আর দাম জানান।</li>
-          <li>আমরা কাজ দেখে, দাম মিলিয়ে পণ্য তালিকায় তুলি।</li>
-          <li>অর্ডার এলে কারিগরকে জানানো হয়, তিনি নিজের হাতে তৈরি করে পাঠান।</li>
-          <li>পণ্য পৌঁছে গেলে, টাকার বড় অংশ সরাসরি কারিগরের হাতে যায়।</li>
-        </ol>
-        <p className="mt-4 text-sm text-stone-600">
-          আপনি যদি কারিগর হন, বা আপনার গ্রামে এমন কেউ থাকে, বাজারের ফেসবুক পাতায়
-          লিখুন। আমরা নিজে গিয়ে কাজ দেখে আসব।
-        </p>
-      </section>
+      <div className="relative mt-10 rounded-[10px] bg-holud-soft p-6 text-center">
+        <StitchFrame />
+        <p className="font-display text-2xl">আপনিও হাতের কাজ করেন?</p>
+        <Link to="/bikreta" className="mt-4 inline-block rounded-full bg-rickshaw px-6 py-3 text-white hover:bg-rickshaw-dark">বিক্রেতা হোন</Link>
+      </div>
     </div>
   )
 }
