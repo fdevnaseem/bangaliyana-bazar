@@ -8,6 +8,7 @@ import ProductDetail from './pages/ProductDetail'
 import CartPage from './pages/CartPage'
 import Checkout from './pages/Checkout'
 import Artisans from './pages/Artisans'
+import MascotLibDemo from './pages/MascotLibDemo'
 
 function NotFound() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/artisans" element={<Artisans />} />
+              <Route path="/mascot" element={<MascotLibDemo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
